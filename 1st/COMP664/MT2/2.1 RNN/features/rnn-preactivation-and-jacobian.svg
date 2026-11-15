@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="1080" viewBox="0 0 1120 1080" role="img" aria-labelledby="title desc">
+<title id="title">RNN preactivation and Jacobian, step by step</title>
+<desc id="desc">Forward flow combines the previous hidden state and current input into preactivation, then applies tanh. The local Jacobian multiplies the diagonal tanh derivative by recurrent weights. A two-feature numerical example shows row scaling. Across time, local Jacobians compose in order and transposed Jacobians propagate loss gradients backward.</desc>
+<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8Z" fill="#47617c"/></marker></defs>
+<rect width="1120" height="1080" fill="#f5f8fc"/>
+<g font-family="Arial, Helvetica, sans-serif" fill="#172b4d">
+<text x="32" y="42" font-size="29" fill="#172b4d" text-anchor="start">RNN preactivation → hidden state → Jacobian</text>
+<text x="32" y="71" font-size="18" fill="#536780" text-anchor="start">Follow one time step, then connect the steps across a sequence.</text>
+<rect x="24" y="92" width="1072" height="290" rx="12" fill="#ffffff" stroke="#d7e1ed"/>
+<text x="44" y="126" font-size="19" fill="#245d91" text-anchor="start">1  FORWARD PASS: what is computed?</text>
+<rect x="45" y="151" width="160" height="65" rx="12" fill="#eaf2ff" stroke="#d7e1ed"/>
+<text x="125" y="179" font-size="16" fill="#172b4d" text-anchor="middle">Previous state</text>
+<text x="125" y="204" font-size="18" fill="#172b4d" text-anchor="middle">hₜ₋₁  (h features)</text>
+<rect x="45" y="254" width="160" height="65" rx="12" fill="#eaf2ff" stroke="#d7e1ed"/>
+<text x="125" y="280" font-size="16" fill="#172b4d" text-anchor="middle">Current input</text>
+<text x="125" y="306" font-size="18" fill="#172b4d" text-anchor="middle">xₜ  (d features)</text>
+<path d="M205 185 L282 185" stroke="#47617c" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+<text x="244" y="172" font-size="19" fill="#172b4d" text-anchor="middle">Wₕₕ</text>
+<path d="M205 287 L282 230" stroke="#47617c" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+<text x="239" y="278" font-size="19" fill="#172b4d" text-anchor="middle">Wₓₕ</text>
+<rect x="285" y="155" width="360" height="100" rx="12" fill="#fff3df" stroke="#d7e1ed"/>
+<text x="465" y="185" font-size="22" fill="#172b4d" text-anchor="middle">Preactivation aₜ</text>
+<text x="465" y="220" font-size="21" fill="#172b4d" text-anchor="middle">aₜ = Wₕₕhₜ₋₁ + Wₓₕxₜ + bₕ</text>
+<text x="465" y="287" font-size="17" fill="#806033" text-anchor="middle">Weighted sum + bias, before tanh</text>
+<path d="M645 205 L720 205" stroke="#47617c" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+<text x="682" y="183" font-size="18" fill="#172b4d" text-anchor="middle">tanh</text>
+<rect x="724" y="155" width="330" height="100" rx="12" fill="#e8f6ef" stroke="#d7e1ed"/>
+<text x="889" y="185" font-size="22" fill="#172b4d" text-anchor="middle">Hidden state hₜ</text>
+<text x="889" y="220" font-size="23" fill="#172b4d" text-anchor="middle">hₜ = tanh(aₜ)</text>
+<text x="889" y="287" font-size="17" fill="#2f7057" text-anchor="middle">Apply tanh to each feature</text>
+<text x="44" y="350" font-size="17" fill="#536780" text-anchor="start">The preactivation and hidden state both have h features. The input xₜ is held fixed below.</text>
+<rect x="24" y="398" width="1072" height="315" rx="12" fill="#ffffff" stroke="#d7e1ed"/>
+<text x="44" y="433" font-size="19" fill="#245d91" text-anchor="start">2  LOCAL JACOBIAN: how does a small change pass through?</text>
+<text x="44" y="470" font-size="26" fill="#172b4d" text-anchor="start">Jₜ = ∂hₜ / ∂hₜ₋₁ = diag(1 − hₜ²) Wₕₕ</text>
+<text x="44" y="501" font-size="18" fill="#536780" text-anchor="start">Recurrent weights mix features first; tanh derivatives then scale each output feature.</text>
+<text x="44" y="542" font-size="18" fill="#172b4d" text-anchor="start">Example: hₜ = (0, 0.8), so the two tanh slopes are 1 and 0.36.</text>
+<path d="M63 566 H55 V631 H63 M217 566 H225 V631 H217" stroke="#2f7057" fill="none" stroke-width="2"/>
+<text x="97.5" y="590" font-size="20" fill="#2f7057" text-anchor="middle">1</text>
+<text x="182.5" y="590" font-size="20" fill="#2f7057" text-anchor="middle">0</text>
+<text x="97.5" y="620" font-size="20" fill="#2f7057" text-anchor="middle">0</text>
+<text x="182.5" y="620" font-size="20" fill="#2f7057" text-anchor="middle">0.36</text>
+<text x="242" y="605" font-size="26" fill="#172b4d" text-anchor="start">×</text>
+<path d="M288 566 H280 V631 H288 M462 566 H470 V631 H462" stroke="#245d91" fill="none" stroke-width="2"/>
+<text x="327.5" y="590" font-size="20" fill="#245d91" text-anchor="middle">0.5</text>
+<text x="422.5" y="590" font-size="20" fill="#245d91" text-anchor="middle">0.2</text>
+<text x="327.5" y="620" font-size="20" fill="#245d91" text-anchor="middle">-0.3</text>
+<text x="422.5" y="620" font-size="20" fill="#245d91" text-anchor="middle">1</text>
+<text x="491" y="605" font-size="26" fill="#172b4d" text-anchor="start">=</text>
+<path d="M537 566 H529 V631 H537 M756 566 H764 V631 H756" stroke="#806033" fill="none" stroke-width="2"/>
+<text x="587.75" y="590" font-size="20" fill="#806033" text-anchor="middle">0.5</text>
+<text x="705.25" y="590" font-size="20" fill="#806033" text-anchor="middle">0.2</text>
+<text x="587.75" y="620" font-size="20" fill="#806033" text-anchor="middle">-0.108</text>
+<text x="705.25" y="620" font-size="20" fill="#806033" text-anchor="middle">0.36</text>
+<text x="795" y="585" font-size="18" fill="#172b4d" text-anchor="start">Jₜ has shape h × h.</text>
+<text x="795" y="615" font-size="18" fill="#172b4d" text-anchor="start">Each row is scaled</text>
+<text x="795" y="641" font-size="18" fill="#172b4d" text-anchor="start">by its tanh slope.</text>
+<text x="44" y="682" font-size="21" fill="#172b4d" text-anchor="start">Δhₜ₋₁ = (0.01, 0)   ⇒   Δhₜ ≈ Jₜ Δhₜ₋₁ = (0.005, −0.00108)</text>
+<rect x="24" y="729" width="1072" height="325" rx="12" fill="#ffffff" stroke="#d7e1ed"/>
+<text x="44" y="764" font-size="19" fill="#245d91" text-anchor="start">3  ACROSS TIME: the chain rule joins the local Jacobians</text>
+<rect x="62" y="794" width="174" height="65" rx="12" fill="#eaf2ff" stroke="#d7e1ed"/>
+<text x="149" y="835" font-size="25" fill="#172b4d" text-anchor="middle">hₛ</text>
+<rect x="370" y="794" width="174" height="65" rx="12" fill="#eaf2ff" stroke="#d7e1ed"/>
+<text x="457" y="835" font-size="25" fill="#172b4d" text-anchor="middle">hₛ₊₁</text>
+<rect x="678" y="794" width="174" height="65" rx="12" fill="#eaf2ff" stroke="#d7e1ed"/>
+<text x="765" y="835" font-size="25" fill="#172b4d" text-anchor="middle">hₛ₊₂</text>
+<path d="M236 826 L368 826" stroke="#47617c" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+<text x="302" y="811" font-size="21" fill="#172b4d" text-anchor="middle">Jₛ₊₁</text>
+<path d="M544 826 L676 826" stroke="#47617c" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+<text x="610" y="811" font-size="21" fill="#172b4d" text-anchor="middle">Jₛ₊₂</text>
+<text x="883" y="821" font-size="17" fill="#172b4d" text-anchor="start">Repeat to</text>
+<text x="883" y="847" font-size="20" fill="#172b4d" text-anchor="start">reach hₜ …</text>
+<text x="44" y="902" font-size="24" fill="#172b4d" text-anchor="start">Forward sensitivity:   ∂hₜ / ∂hₛ = Jₜ Jₜ₋₁ ⋯ Jₛ₊₁</text>
+<text x="44" y="936" font-size="18" fill="#536780" text-anchor="start">The rightmost matrix acts first. Matrix order matters.</text>
+<text x="44" y="978" font-size="23" fill="#172b4d" text-anchor="start">Backward loss gradient:   gₛ = Jₛ₊₁ᵀ ⋯ Jₜ₋₁ᵀ Jₜᵀ gₜ</text>
+<text x="44" y="1017" font-size="17" fill="#536780" text-anchor="start">gᵤ = ∇ₕᵤL. This shows one state path; add contributions from other loss paths.</text>
+</g></svg>
